@@ -40,6 +40,7 @@ namespace std { template<class T> struct complex { T real; T imag; }; }
 #define MPI_STATUS_IGNORE 0
 #define MPI_STATUSES_IGNORE 0
 #define MPI_SUM 0
+#define MPI_INFO_NULL 0 // no extras being passed into a routine
 
 // mock functions
 int MPI_Comm_size(MPI_Comm, int *);
