@@ -54,6 +54,33 @@ void MPIChecker::checkDoubleNonblocking(const CallEvent &PreCallEvent,
   }
 }
 
+void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
+                                  CheckerContext &Ctx) const {
+  if (!FuncClassifier->isMPI_File_close(PreCallEvent.getCalleeIdentifier())) {
+    return;
+  }
+  const MemRegion *const MR =
+      PreCallEvent.getArgSVal(PreCallEvent.getNumArgs() - 1).getAsRegion();
+  if(!MR)
+      return;
+  const ElementRegion *const ER = dyn_cast<ElementRegion>(MR);
+  
+  if(!isa<TypedRegion>(MR) || (ER && !isa<TypedRegion>(ER->getSuperRegion())))
+      return;
+
+  ProgramStateRef State = Ctx.getState();
+  const Request *const fh = State->get<RequestMap>(MR);
+
+  if(fh && fh->CurrentState == Request::State::Nonblocking) {
+    ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
+    BReporter.reportDoubleClose(PreCallEvent, *fh, MR, ErrorNode,
+                                Ctx.getBugReporter());
+    Ctx.addTransition(State);
+  }
+
+
+}
+
 void MPIChecker::checkUnmatchedWaits(const CallEvent &PreCallEvent,
                                      CheckerContext &Ctx) const {
   if (!FuncClassifier->isWaitType(PreCallEvent.getCalleeIdentifier()))

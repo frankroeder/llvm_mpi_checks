@@ -47,6 +47,32 @@ void MPIBugReporter::reportDoubleNonblocking(
   BReporter.emitReport(std::move(Report));
 }
 
+void MPIBugReporter::reportDoubleClose(
+    const CallEvent &MPICallEvent, const ento::mpi::MPIFile &fh,
+    const MemRegion *const FileRegion,
+    const ExplodedNode *const ExplNode,
+    BugReporter &BReporter) const {
+
+  std::string ErrorText;
+  ErrorText = "Double close on file " +
+              FileRegion->getDescriptiveName() + ". ";
+
+  auto Report = llvm::make_unique<BugReport>(*DoubleCloseBugType,
+                                             ErrorText, ExplNode);
+
+  Report->addRange(MPICallEvent.getSourceRange());
+  SourceRange Range = FileRegion->sourceRange();
+
+  if (Range.isValid())
+    Report->addRange(Range);
+
+  Report->addVisitor(llvm::make_unique<RequestNodeVisitor>(
+      FileRegion, "File is previously closed here. "));
+  Report->markInteresting(FileRegion);
+
+  BReporter.emitReport(std::move(Report));
+}
+
 void MPIBugReporter::reportMissingWait(
     const ento::mpi::Request &Req, const MemRegion *const RequestRegion,
     const ExplodedNode *const ExplNode,

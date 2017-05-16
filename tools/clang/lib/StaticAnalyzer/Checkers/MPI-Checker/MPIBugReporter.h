@@ -17,6 +17,7 @@
 #define LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_MPICHECKER_MPIBUGREPORTER_H
 
 #include "MPITypes.h"
+#include "MPITypes_2.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 
 namespace clang {
@@ -30,6 +31,7 @@ public:
     DoubleNonblockingBugType.reset(
         new BugType(&CB, "Double nonblocking", MPIError));
     MissingWaitBugType.reset(new BugType(&CB, "Missing wait", MPIError));
+    DoubleCloseBugType.reset(new BugType(&CB, "Double Close", MPIError));
   }
 
   /// Report duplicate request use by nonblocking calls without intermediate
@@ -68,6 +70,12 @@ public:
                            const ExplodedNode *const ExplNode,
                            BugReporter &BReporter) const;
 
+  void reportDoubleClose(const CallEvent &MPICallEvent,
+                          const MPIFile &fh,
+                          const MemRegion *const RequestRegion,
+                          const ExplodedNode *const ExplNode,
+                          BugReporter &BReporter) const;
+
 private:
   const std::string MPIError = "MPI Error";
 
@@ -75,6 +83,7 @@ private:
   std::unique_ptr<BugType> UnmatchedWaitBugType;
   std::unique_ptr<BugType> MissingWaitBugType;
   std::unique_ptr<BugType> DoubleNonblockingBugType;
+  std::unique_ptr<BugType> DoubleCloseBugType;
 
   /// Bug visitor class to find the node where the request region was previously
   /// used in order to include it into the BugReport path.

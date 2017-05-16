@@ -47,6 +47,8 @@ public:
   bool isMPIWR_Type(const IdentifierInfo *const IdentInfo) const;
   bool isMPI_File_write_at(const IdentifierInfo *IdentInfo) const;
   bool isMPI_File_read_at(const IdentifierInfo *IdentInfo) const;
+  bool isMPI_File_open(const IdentifierInfo *IdentInfo) const;
+  bool isMPI_File_close(const IdentifierInfo *IdentInfo) const;
 
   // additional identifiers
   bool isMPI_Wait(const IdentifierInfo *const IdentInfo) const;

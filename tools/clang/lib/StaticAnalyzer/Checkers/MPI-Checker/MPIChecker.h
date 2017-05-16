@@ -20,6 +20,7 @@
 
 #include "MPIBugReporter.h"
 #include "MPITypes.h"
+#include "MPITypes_2.h"
 #include "clang/StaticAnalyzer/Checkers/MPIFunctionClassifier.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
@@ -37,6 +38,7 @@ public:
     dynamicInit(Ctx);
     checkUnmatchedWaits(CE, Ctx);
     checkDoubleNonblocking(CE, Ctx);
+    checkDoubleClose(CE, Ctx);
   }
 
   void checkDeadSymbols(SymbolReaper &SymReaper, CheckerContext &Ctx) const {
@@ -72,6 +74,9 @@ public:
   /// request was a nonblocking call, this is rated as a missing wait.
   void checkMissingWaits(clang::ento::SymbolReaper &SymReaper,
                          clang::ento::CheckerContext &Ctx) const;
+
+  void checkDoubleClose(const clang::ento::CallEvent &PreCallEvent,
+                        clang::ento::CheckerContext &Ctx) const;
 
 private:
   /// Collects all memory regions of a request(array) used by a wait

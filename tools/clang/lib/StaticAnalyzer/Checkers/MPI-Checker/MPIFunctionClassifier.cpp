@@ -340,6 +340,16 @@ bool MPIFunctionClassifier::isMPI_IOType(
   	return llvm::is_contained(MPIIOTypes, IdentInfo);
 }
 
+bool MPIFunctionClassifier::isMPI_File_open(
+    const IdentifierInfo *IdentInfo) const {
+    return IdentInfo == IdentInfo_MPI_File_open;
+}
+
+bool MPIFunctionClassifier::isMPI_File_close(
+    const IdentifierInfo *IdentInfo) const {
+    return IdentInfo == IdentInfo_MPI_File_close;
+}
+
 bool MPIFunctionClassifier::isMPIWR_Type(
   const IdentifierInfo *IdentInfo) const {
   return IdentInfo == IdentInfo_MPI_File_write ||

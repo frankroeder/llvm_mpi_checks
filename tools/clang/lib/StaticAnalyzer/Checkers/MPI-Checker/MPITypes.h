@@ -53,6 +53,7 @@ typedef llvm::ImmutableMap<const clang::ento::MemRegion *,
 
 } // end of namespace: mpi
 
+
 template <>
 struct ProgramStateTrait<mpi::RequestMap>
     : public ProgramStatePartialTrait<mpi::RequestMapImpl> {
