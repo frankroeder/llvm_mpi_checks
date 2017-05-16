@@ -35,8 +35,8 @@ typedef llvm::ImmutableMap<const clang::ento::MemRegion *,
 } // end of namespace: mpi
 
 template <>
-struct ProgramStateTrait<mpi::FileMap>
-    : public ProgramStatePartialTrait<mpi::FileMapImpl> {
+struct ProgramStateTrait<mpi::MPIFileMap>
+    : public ProgramStatePartialTrait<mpi::MPIFileMapImpl> {
   static void *GDMIndex() {
     static int index = 0;
     return &index;

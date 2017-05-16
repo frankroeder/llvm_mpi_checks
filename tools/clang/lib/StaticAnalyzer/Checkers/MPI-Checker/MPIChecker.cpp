@@ -69,9 +69,9 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
       return;
 
   ProgramStateRef State = Ctx.getState();
-  const Request *const fh = State->get<RequestMap>(MR);
+  const MPIFile *const fh = State->get<MPIFileMap>(MR);
 
-  if(fh && fh->CurrentState == Request::State::Nonblocking) {
+  if(fh && fh->CurrentState == MPIFile::State::Close) {
     ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
     BReporter.reportDoubleClose(PreCallEvent, *fh, MR, ErrorNode,
                                 Ctx.getBugReporter());
