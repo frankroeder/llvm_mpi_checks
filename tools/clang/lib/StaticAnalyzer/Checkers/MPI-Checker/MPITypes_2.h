@@ -32,6 +32,8 @@ public:
 
 // MemRegio Mapping lesen
 struct MPIFileMap {};
+// LLVM Immutable container to store data structures
+// the maps should NOT be stores inside the checker class/state
 typedef llvm::ImmutableMap<const clang::ento::MemRegion *,
                            clang::ento::mpi::MPIFile>
     MPIFileMapImpl;

@@ -72,11 +72,13 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
       return;
   /* get actual Ctx (CheckerContext structure) as programstate
     this will have information for the begugging message and many more
-    ProgramState holds complete information on a momentary state of the program under analysis */
+    ProgramState holds complete information on a momentary state of the program under analysis 
+    New State needs to be created, because the original ones are immutable*/
   ProgramStateRef State = Ctx.getState();
   const MPIFile *const Fh = State->get<MPIFileMap>(MR);
 
   // create ErrorNode
+  // if FH and Fh is already stored in the MPIFileMap(MR)
   if(Fh && Fh->CurrentState == MPIFile::State::Close) {
     // Ctx.generateNonFatalErrorNode()
     // This node will not be a sink. That is, exploration will continue along this path.
@@ -87,7 +89,9 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
   }
   // no error keep on analyse
   else {
+    // obtain a new state with a modified trait value
     State = State->set<MPIFileMap>(MR, MPIFile::State::Close);
+    // add modified State
     Ctx.addTransition(State);
   }
 }
