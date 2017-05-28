@@ -56,29 +56,40 @@ void MPIChecker::checkDoubleNonblocking(const CallEvent &PreCallEvent,
 
 void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
                                   CheckerContext &Ctx) const {
+  // Get the CallEvent PreCallEvent and check if there is Pointer to a
+  // valid Ident Info returned by isMPI_File_close
   if (!FuncClassifier->isMPI_File_close(PreCallEvent.getCalleeIdentifier())) {
     return;
   }
+  // load the file on position NumArgs - 1 into MemRegion
   const MemRegion *const MR =
       PreCallEvent.getArgSVal(PreCallEvent.getNumArgs() - 1).getAsRegion();
   if(!MR)
       return;
   const ElementRegion *const ER = dyn_cast<ElementRegion>(MR);
-  
+  // something wrong with the type?
   if(!isa<TypedRegion>(MR) || (ER && !isa<TypedRegion>(ER->getSuperRegion())))
       return;
-
+  /* get actual Ctx (CheckerContext structure) as programstate
+    this will have information for the begugging message and many more
+    ProgramState holds complete information on a momentary state of the program under analysis */
   ProgramStateRef State = Ctx.getState();
-  const MPIFile *const fh = State->get<MPIFileMap>(MR);
+  const MPIFile *const Fh = State->get<MPIFileMap>(MR);
 
-  if(fh && fh->CurrentState == MPIFile::State::Close) {
+  // create ErrorNode
+  if(Fh && Fh->CurrentState == MPIFile::State::Close) {
+    // Ctx.generateNonFatalErrorNode()
+    // This node will not be a sink. That is, exploration will continue along this path.
     ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
-    BReporter.reportDoubleClose(PreCallEvent, *fh, MR, ErrorNode,
+    BReporter.reportDoubleClose(PreCallEvent, *Fh, MR, ErrorNode,
                                 Ctx.getBugReporter());
+    Ctx.addTransition(ErrorNode->getState(), ErrorNode);
+  }
+  // no error keep on analyse
+  else {
+    State = State->set<MPIFileMap>(MR, MPIFile::State::Close);
     Ctx.addTransition(State);
   }
-
-
 }
 
 void MPIChecker::checkUnmatchedWaits(const CallEvent &PreCallEvent,

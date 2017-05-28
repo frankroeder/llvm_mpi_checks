@@ -11,14 +11,18 @@ namespace mpi {
 
 class MPIFile {
 public:
+  // file can be Open or Close
   enum State : unsigned char { Open, Close };
 
+  // capture current state as MPIFile
   MPIFile(State S) : CurrentState{S} {}
 
+  // need other ID?
   void Profile(llvm::FoldingSetNodeID &Id) const {
     Id.AddInteger(CurrentState);
   }
 
+  // current state = file
   bool operator==(const MPIFile &ToCompare) const {
     return CurrentState == ToCompare.CurrentState;
   }
@@ -26,7 +30,7 @@ public:
   const State CurrentState;
 };
 
-
+// MemRegio Mapping lesen
 struct MPIFileMap {};
 typedef llvm::ImmutableMap<const clang::ento::MemRegion *,
                            clang::ento::mpi::MPIFile>
