@@ -14,10 +14,10 @@ public:
   // file can be Open or Close
   enum State : unsigned char { Open, Close };
 
-  // capture current state as MPIFile
   MPIFile(State S) : CurrentState{S} {}
 
-  // need other ID?
+  // FastFoldingSetNode - This is a subclass of FoldingSetNode which stores
+  // a FoldingSetNodeID value rather than requiring the node to recompute it each time it is needed.
   void Profile(llvm::FoldingSetNodeID &Id) const {
     Id.AddInteger(CurrentState);
   }
@@ -33,13 +33,15 @@ public:
 // MemRegio Mapping lesen
 struct MPIFileMap {};
 // LLVM Immutable container to store data structures
-// the maps should NOT be stores inside the checker class/state
+// the maps should NOT be stored inside the checker class/state
 typedef llvm::ImmutableMap<const clang::ento::MemRegion *,
                            clang::ento::mpi::MPIFile>
     MPIFileMapImpl;
 
 } // end of namespace: mpi
 
+// new defined trait
+// state by calling State->get<TraitName>(), or set<MapName>(Key,Value)
 template <>
 struct ProgramStateTrait<mpi::MPIFileMap>
     : public ProgramStatePartialTrait<mpi::MPIFileMapImpl> {

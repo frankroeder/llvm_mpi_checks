@@ -56,7 +56,7 @@ void MPIChecker::checkDoubleNonblocking(const CallEvent &PreCallEvent,
 
 void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
                                   CheckerContext &Ctx) const {
-  // Get the CallEvent PreCallEvent and check if there is Pointer to a
+  // Get the CallEvent PreCallEvent(Path-sensitive callback) and check if there is Pointer to a
   // valid Ident Info returned by isMPI_File_close
   if (!FuncClassifier->isMPI_File_close(PreCallEvent.getCalleeIdentifier())) {
     return;
@@ -90,8 +90,10 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
   // no error keep on analyse
   else {
     // obtain a new state with a modified trait value
+    // trait was defined in MPITypes_2.h
+    // through set a new state is obtained, but with modified trait value
     State = State->set<MPIFileMap>(MR, MPIFile::State::Close);
-    // add modified State
+    // add new modified State
     Ctx.addTransition(State);
   }
 }
