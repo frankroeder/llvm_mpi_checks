@@ -22,7 +22,7 @@ public:
     Id.AddInteger(CurrentState);
   }
 
-  // current state = file
+  // current state = MPIFiles State
   bool operator==(const MPIFile &ToCompare) const {
     return CurrentState == ToCompare.CurrentState;
   }

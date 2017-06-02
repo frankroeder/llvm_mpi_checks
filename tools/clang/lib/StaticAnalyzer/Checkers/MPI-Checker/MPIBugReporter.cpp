@@ -48,27 +48,27 @@ void MPIBugReporter::reportDoubleNonblocking(
 }
 
 void MPIBugReporter::reportDoubleClose(
-    const CallEvent &MPICallEvent, const ento::mpi::MPIFile &fh,
-    const MemRegion *const FileRegion,
+    const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
+    const MemRegion *const MPIFileRegion,
     const ExplodedNode *const ExplNode,
     BugReporter &BReporter) const {
 
   std::string ErrorText;
   ErrorText = "Double close on file " +
-              FileRegion->getDescriptiveName() + ". ";
+              MPIFileRegion->getDescriptiveName() + ". ";
 
   auto Report = llvm::make_unique<BugReport>(*DoubleCloseBugType,
                                              ErrorText, ExplNode);
 
   Report->addRange(MPICallEvent.getSourceRange());
-  SourceRange Range = FileRegion->sourceRange();
+  SourceRange Range = MPIFileRegion->sourceRange();
 
   if (Range.isValid())
     Report->addRange(Range);
 
-  Report->addVisitor(llvm::make_unique<RequestNodeVisitor>(
-      FileRegion, "File is previously closed here. "));
-  Report->markInteresting(FileRegion);
+  Report->addVisitor(llvm::make_unique<MPIFileNodeVisitor>(
+      MPIFileRegion, "File is previously closed here. "));
+  Report->markInteresting(MPIFileRegion);
 
   BReporter.emitReport(std::move(Report));
 }
@@ -126,6 +126,33 @@ MPIBugReporter::RequestNodeVisitor::VisitNode(const ExplodedNode *N,
 
   // Check if request was previously unused or in a different state.
   if ((Req && !PrevReq) || (Req->CurrentState != PrevReq->CurrentState)) {
+    IsNodeFound = true;
+
+    ProgramPoint P = PrevN->getLocation();
+    PathDiagnosticLocation L =
+        PathDiagnosticLocation::create(P, BRC.getSourceManager());
+
+    return std::make_shared<PathDiagnosticEventPiece>(L, ErrorText);
+  }
+
+  return nullptr;
+}
+
+std::shared_ptr<PathDiagnosticPiece>
+MPIBugReporter::MPIFileNodeVisitor::VisitNode(const ExplodedNode *N,
+                                              const ExplodedNode *PrevN,
+                                              BugReporterContext &BRC,
+                                              BugReport &BR) {
+
+  if (IsNodeFound)
+    return nullptr;
+
+  const MPIFile *const Fh = N->getState()->get<MPIFileMap>(MPIFileRegion);
+  const MPIFile *const PrevFh =
+      PrevN->getState()->get<MPIFileMap>(MPIFileRegion);
+
+  // check if the file was previously unused
+  if ((Fh && !PrevFh) || (Fh->CurrentState != PrevFh->CurrentState)) {
     IsNodeFound = true;
 
     ProgramPoint P = PrevN->getLocation();

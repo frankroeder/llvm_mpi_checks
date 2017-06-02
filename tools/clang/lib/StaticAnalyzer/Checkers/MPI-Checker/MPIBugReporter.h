@@ -72,7 +72,7 @@ public:
 
   void reportDoubleClose(const CallEvent &MPICallEvent,
                           const MPIFile &fh,
-                          const MemRegion *const RequestRegion,
+                          const MemRegion *const MPIFileRegion,
                           const ExplodedNode *const ExplNode,
                           BugReporter &BReporter) const;
 
@@ -106,6 +106,30 @@ private:
 
   private:
     const MemRegion *const RequestRegion;
+    bool IsNodeFound = false;
+    std::string ErrorText;
+  };
+
+  // class to observe the path of the used file or the bugreport
+  class MPIFileNodeVisitor : public BugReporterVisitorImpl<MPIFileNodeVisitor> {
+  public:
+    MPIFileNodeVisitor(const MemRegion *const MemoryRegion,
+                       const std::string &ErrText)
+        : MPIFileRegion(MemoryRegion), ErrorText(ErrText) {}
+
+    void Profile(llvm::FoldingSetNodeID &ID) const override {
+      static int X = 0;
+      ID.AddPointer(&X);
+      ID.AddPointer(MPIFileRegion);
+    }
+
+    std::shared_ptr<PathDiagnosticPiece> VisitNode(const ExplodedNode *N,
+                                                   const ExplodedNode *PrevN,
+                                                   BugReporterContext &BRC,
+                                                   BugReport &BR) override;
+
+  private:
+    const MemRegion *const MPIFileRegion;
     bool IsNodeFound = false;
     std::string ErrorText;
   };
