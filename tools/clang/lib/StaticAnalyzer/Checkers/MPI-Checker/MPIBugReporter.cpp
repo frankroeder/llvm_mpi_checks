@@ -47,6 +47,25 @@ void MPIBugReporter::reportDoubleNonblocking(
   BReporter.emitReport(std::move(Report));
 }
 
+void MPIBugReporter::reportOpen(
+        const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
+        const MemRegion *const MPIFileRegion,
+        const ExplodedNode *const ExplNode,
+        BugReporter &BReporter) const {
+    std::string ErrorText;
+    ErrorText = "File was opened here on file " +
+        MPIFileRegion->getDescriptiveName() + ". ";
+    auto Report = llvm::make_unique<BugReport>(*OpenBugType,
+                                                ErrorText, ExplNode);
+    Report->addRange(MPICallEvent.getSourceRange());
+    SourceRange Range = MPIFileRegion->sourceRange();
+    
+    if (Range.isValid())
+    Report->addRange(Range);
+  BReporter.emitReport(std::move(Report));
+
+}
+
 void MPIBugReporter::reportDoubleClose(
     const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
     const MemRegion *const MPIFileRegion,
@@ -68,6 +87,27 @@ void MPIBugReporter::reportDoubleClose(
 
   Report->addVisitor(llvm::make_unique<MPIFileNodeVisitor>(
       MPIFileRegion, "File is previously closed here. "));
+  Report->markInteresting(MPIFileRegion);
+
+  BReporter.emitReport(std::move(Report));
+}
+void MPIBugReporter::reportFileLeak(const ento::mpi::MPIFile &Fh,
+                                    const MemRegion *const MPIFileRegion,
+                                    const ExplodedNode *const ExplNode,
+                                    BugReporter &BReporter) const {
+
+  std::string ErrorText;
+  ErrorText =
+      "File has not been closed " + MPIFileRegion->getDescriptiveName() + ". ";
+
+  auto Report =
+      llvm::make_unique<BugReport>(*FileLeakBugType, ErrorText, ExplNode);
+  SourceRange Range = MPIFileRegion->sourceRange();
+  if (Range.isValid())
+    Report->addRange(Range);
+
+  Report->addVisitor(llvm::make_unique<MPIFileNodeVisitor>(
+      MPIFileRegion, "File was previously opened here. "));
   Report->markInteresting(MPIFileRegion);
 
   BReporter.emitReport(std::move(Report));

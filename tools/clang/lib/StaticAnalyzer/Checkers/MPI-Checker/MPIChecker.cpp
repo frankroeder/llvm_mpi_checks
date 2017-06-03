@@ -97,6 +97,62 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
     Ctx.addTransition(State);
   }
 }
+void MPIChecker::checkFileLeak(SymbolReaper &SymReaper,
+                                           CheckerContext &Ctx) const {
+  if (SymReaper.hasDeadSymbols())
+    return;
+  ProgramStateRef State = Ctx.getState();
+  const auto &MPIFiles = State->get<MPIFileMap>();
+  if(MPIFiles.isEmpty())
+      return;
+
+  static CheckerProgramPointTag Tag("MPI-Checker", "File Leak");
+  ExplodedNode *ErrorNode{nullptr};
+
+  auto FileMap = State->get<MPIFileMap>();
+  for (const auto &Fh : FileMap) {
+    // first one is alive - this is the open
+    if (!SymReaper.isLiveRegion(Fh.first))
+      // second one is the not detected close
+      if (Fh.second.CurrentState == MPIFile::State::Open) {
+        if (!ErrorNode) {
+          ErrorNode = Ctx.generateNonFatalErrorNode(State, &Tag);
+          State = ErrorNode->getState();
+        }
+        BReporter.reportFileLeak(Fh.second, Fh.first, ErrorNode,
+                                 Ctx.getBugReporter());
+      }
+    State = State->remove<MPIFileMap>(Fh.first);
+    // Report not close detected after open
+  }
+
+}
+void MPIChecker::checkFileOpen(const CallEvent &PreCallEvent,
+                               CheckerContext &Ctx) const {
+  // if the Func Call is File_Open
+  if (!FuncClassifier->isMPI_File_open(PreCallEvent.getCalleeIdentifier())) {
+    return;
+  }
+  const MemRegion *const MR =
+      PreCallEvent.getArgSVal(PreCallEvent.getNumArgs() - 1).getAsRegion();
+  if (!MR)
+    return;
+  const ElementRegion *const ER = dyn_cast<ElementRegion>(MR);
+  // something wrong with the type?
+  if (!isa<TypedRegion>(MR) || (ER && !isa<TypedRegion>(ER->getSuperRegion())))
+    return;
+  // capture the next transition where the State is open
+  ProgramStateRef State = Ctx.getState();
+  const MPIFile *const Fh = State->get<MPIFileMap>(MR);
+  State = State->set<MPIFileMap>(MR, MPIFile::State::Open);
+      printf("File is open\n");
+
+  // just to check the functionality
+  ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
+    BReporter.reportOpen(PreCallEvent, *Fh, MR, ErrorNode,
+                                      Ctx.getBugReporter());
+    Ctx.addTransition(ErrorNode->getState(), ErrorNode);
+}
 
 void MPIChecker::checkUnmatchedWaits(const CallEvent &PreCallEvent,
                                      CheckerContext &Ctx) const {

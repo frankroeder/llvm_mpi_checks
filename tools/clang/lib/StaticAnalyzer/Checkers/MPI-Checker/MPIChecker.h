@@ -38,12 +38,14 @@ public:
     dynamicInit(Ctx);
     checkUnmatchedWaits(CE, Ctx);
     checkDoubleNonblocking(CE, Ctx);
+    checkFileOpen(CE, Ctx);
     checkDoubleClose(CE, Ctx);
   }
 
   void checkDeadSymbols(SymbolReaper &SymReaper, CheckerContext &Ctx) const {
     dynamicInit(Ctx);
     checkMissingWaits(SymReaper, Ctx);
+    checkFileLeak(SymReaper, Ctx);
   }
 
   void dynamicInit(CheckerContext &Ctx) const {
@@ -78,6 +80,12 @@ public:
   void checkDoubleClose(const clang::ento::CallEvent &PreCallEvent,
                         clang::ento::CheckerContext &Ctx) const;
 
+  void checkFileLeak(clang::ento::SymbolReaper &SymReaper,
+                     clang::ento::CheckerContext &Ctx) const;
+
+  void checkFileOpen(const clang::ento::CallEvent &PreCallEvent,
+                     clang::ento::CheckerContext &Ctx) const;
+
 private:
   /// Collects all memory regions of a request(array) used by a wait
   /// function. If the wait function uses a single request, this is a single
@@ -101,6 +109,7 @@ private:
 
   const std::unique_ptr<MPIFunctionClassifier> FuncClassifier;
   MPIBugReporter BReporter;
+
 };
 
 } // end of namespace: mpi

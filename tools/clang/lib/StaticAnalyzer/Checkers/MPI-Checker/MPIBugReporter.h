@@ -32,6 +32,9 @@ public:
         new BugType(&CB, "Double nonblocking", MPIError));
     MissingWaitBugType.reset(new BugType(&CB, "Missing wait", MPIError));
     DoubleCloseBugType.reset(new BugType(&CB, "Double Close", MPIError));
+    FileLeakBugType.reset(
+        new BugType(&CB, "File has not been closed after open", MPIError));
+    OpenBugType.reset(new BugType(&CB, "Opened", MPIError));
   }
 
   /// Report duplicate request use by nonblocking calls without intermediate
@@ -76,6 +79,15 @@ public:
                           const ExplodedNode *const ExplNode,
                           BugReporter &BReporter) const;
 
+  void reportFileLeak(const MPIFile &fh, const MemRegion *const MPIFileRegion,
+                      const ExplodedNode *const ExplNode,
+                      BugReporter &BReporter) const;
+
+  void reportOpen(const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
+                  const MemRegion *const MPIFileRegion,
+                  const ExplodedNode *const ExplNode,
+                  BugReporter &BReporter) const;
+
 private:
   const std::string MPIError = "MPI Error";
 
@@ -84,9 +96,11 @@ private:
   std::unique_ptr<BugType> MissingWaitBugType;
   std::unique_ptr<BugType> DoubleNonblockingBugType;
   std::unique_ptr<BugType> DoubleCloseBugType;
+  std::unique_ptr<BugType> FileLeakBugType;
+  std::unique_ptr<BugType> OpenBugType;
 
-  /// Bug visitor class to find the node where the request region was previously
-  /// used in order to include it into the BugReport path.
+  /// Bug visitor class to find the node where the request region was
+  /// previously used in order to include it into the BugReport path.
   class RequestNodeVisitor : public BugReporterVisitorImpl<RequestNodeVisitor> {
   public:
     RequestNodeVisitor(const MemRegion *const MemoryRegion,
@@ -108,31 +122,32 @@ private:
     const MemRegion *const RequestRegion;
     bool IsNodeFound = false;
     std::string ErrorText;
-  };
+    };
 
-  // class to observe the path of the used file or the bugreport
-  class MPIFileNodeVisitor : public BugReporterVisitorImpl<MPIFileNodeVisitor> {
-  public:
-    MPIFileNodeVisitor(const MemRegion *const MemoryRegion,
-                       const std::string &ErrText)
-        : MPIFileRegion(MemoryRegion), ErrorText(ErrText) {}
+    // class to observe the path of the used file or the bugreport
+    class MPIFileNodeVisitor
+        : public BugReporterVisitorImpl<MPIFileNodeVisitor> {
+    public:
+      MPIFileNodeVisitor(const MemRegion *const MemoryRegion,
+                         const std::string &ErrText)
+          : MPIFileRegion(MemoryRegion), ErrorText(ErrText) {}
 
-    void Profile(llvm::FoldingSetNodeID &ID) const override {
-      static int X = 0;
-      ID.AddPointer(&X);
-      ID.AddPointer(MPIFileRegion);
-    }
+      void Profile(llvm::FoldingSetNodeID &ID) const override {
+        static int X = 0;
+        ID.AddPointer(&X);
+        ID.AddPointer(MPIFileRegion);
+      }
 
-    std::shared_ptr<PathDiagnosticPiece> VisitNode(const ExplodedNode *N,
-                                                   const ExplodedNode *PrevN,
-                                                   BugReporterContext &BRC,
-                                                   BugReport &BR) override;
+      std::shared_ptr<PathDiagnosticPiece> VisitNode(const ExplodedNode *N,
+                                                     const ExplodedNode *PrevN,
+                                                     BugReporterContext &BRC,
+                                                     BugReport &BR) override;
 
-  private:
-    const MemRegion *const MPIFileRegion;
-    bool IsNodeFound = false;
-    std::string ErrorText;
-  };
+    private:
+      const MemRegion *const MPIFileRegion;
+      bool IsNodeFound = false;
+      std::string ErrorText;
+    };
 };
 
 } // end of namespace: mpi
