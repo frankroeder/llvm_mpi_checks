@@ -34,7 +34,7 @@ public:
     DoubleCloseBugType.reset(new BugType(&CB, "Double Close", MPIError));
     FileLeakBugType.reset(
         new BugType(&CB, "File has not been closed after open", MPIError));
-    OpenBugType.reset(new BugType(&CB, "Opened", MPIError));
+    DoubleOpenBugType.reset(new BugType(&CB, "Double Open", MPIError));
   }
 
   /// Report duplicate request use by nonblocking calls without intermediate
@@ -83,7 +83,7 @@ public:
                       const ExplodedNode *const ExplNode,
                       BugReporter &BReporter) const;
 
-  void reportOpen(const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
+  void reportDoubleOpen(const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
                   const MemRegion *const MPIFileRegion,
                   const ExplodedNode *const ExplNode,
                   BugReporter &BReporter) const;
@@ -97,7 +97,7 @@ private:
   std::unique_ptr<BugType> DoubleNonblockingBugType;
   std::unique_ptr<BugType> DoubleCloseBugType;
   std::unique_ptr<BugType> FileLeakBugType;
-  std::unique_ptr<BugType> OpenBugType;
+  std::unique_ptr<BugType> DoubleOpenBugType;
 
   /// Bug visitor class to find the node where the request region was
   /// previously used in order to include it into the BugReport path.
@@ -124,7 +124,7 @@ private:
     std::string ErrorText;
     };
 
-    // class to observe the path of the used file or the bugreport
+    // class to observe the path of the used file for the bugreport
     class MPIFileNodeVisitor
         : public BugReporterVisitorImpl<MPIFileNodeVisitor> {
     public:

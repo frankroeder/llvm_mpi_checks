@@ -56,32 +56,35 @@ void MPIChecker::checkDoubleNonblocking(const CallEvent &PreCallEvent,
 
 void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
                                   CheckerContext &Ctx) const {
-  // Get the CallEvent PreCallEvent(Path-sensitive callback) and check if there is Pointer to a
-  // valid Ident Info returned by isMPI_File_close
+  // Get the CallEvent PreCallEvent(Path-sensitive callback) and check if there
+  // is Pointer to a valid Ident Info returned by isMPI_File_close
   if (!FuncClassifier->isMPI_File_close(PreCallEvent.getCalleeIdentifier())) {
     return;
   }
   // load the file on position NumArgs - 1 into MemRegion
   const MemRegion *const MR =
+      // or getArgSVal(0)
       PreCallEvent.getArgSVal(PreCallEvent.getNumArgs() - 1).getAsRegion();
-  if(!MR)
-      return;
+  if (!MR)
+    return;
   const ElementRegion *const ER = dyn_cast<ElementRegion>(MR);
   // something wrong with the type?
-  if(!isa<TypedRegion>(MR) || (ER && !isa<TypedRegion>(ER->getSuperRegion())))
-      return;
+  if (!isa<TypedRegion>(MR) || (ER && !isa<TypedRegion>(ER->getSuperRegion())))
+    return;
   /* get actual Ctx (CheckerContext structure) as programstate
     this will have information for the begugging message and many more
-    ProgramState holds complete information on a momentary state of the program under analysis 
-    New State needs to be created, because the original ones are immutable*/
+    ProgramState holds complete information on a momentary state of the program
+    under analysis New State needs to be created, because the original ones are
+    immutable*/
   ProgramStateRef State = Ctx.getState();
   const MPIFile *const Fh = State->get<MPIFileMap>(MR);
 
   // create ErrorNode
   // if FH and Fh is already stored in the MPIFileMap(MR)
-  if(Fh && Fh->CurrentState == MPIFile::State::Close) {
+  if (Fh && Fh->CurrentState == MPIFile::State::Close) {
     // Ctx.generateNonFatalErrorNode()
-    // This node will not be a sink. That is, exploration will continue along this path.
+    // This node will not be a sink. That is, exploration will continue along
+    // this path.
     ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
     BReporter.reportDoubleClose(PreCallEvent, *Fh, MR, ErrorNode,
                                 Ctx.getBugReporter());
@@ -97,24 +100,28 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
     Ctx.addTransition(State);
   }
 }
-void MPIChecker::checkFileLeak(SymbolReaper &SymReaper,
-                                           CheckerContext &Ctx) const {
-  if (SymReaper.hasDeadSymbols())
+
+void MPIChecker::checkMissingClose(SymbolReaper &SymReaper,
+                                   CheckerContext &Ctx) const {
+  if (!SymReaper.hasDeadSymbols())
     return;
+
   ProgramStateRef State = Ctx.getState();
   const auto &MPIFiles = State->get<MPIFileMap>();
-  if(MPIFiles.isEmpty())
-      return;
+  // still empty
+  if (MPIFiles.isEmpty())
+    return;
 
   static CheckerProgramPointTag Tag("MPI-Checker", "File Leak");
   ExplodedNode *ErrorNode{nullptr};
 
   auto FileMap = State->get<MPIFileMap>();
   for (const auto &Fh : FileMap) {
-    // first one is alive - this is the open
-    if (!SymReaper.isLiveRegion(Fh.first))
-      // second one is the not detected close
+    if (!SymReaper.isLiveRegion(Fh.first)) {
+      printf("true \n");
+      // if Open is not alive and the file keeps being open
       if (Fh.second.CurrentState == MPIFile::State::Open) {
+      printf("true2 \n");
         if (!ErrorNode) {
           ErrorNode = Ctx.generateNonFatalErrorNode(State, &Tag);
           State = ErrorNode->getState();
@@ -122,12 +129,19 @@ void MPIChecker::checkFileLeak(SymbolReaper &SymReaper,
         BReporter.reportFileLeak(Fh.second, Fh.first, ErrorNode,
                                  Ctx.getBugReporter());
       }
-    State = State->remove<MPIFileMap>(Fh.first);
-    // Report not close detected after open
+      // Remove the dead symbol from the MPIFileMap
+      State = State->remove<MPIFileMap>(Fh.first);
+    }
   }
-
+  // Transition to update the state regarding removed requests.
+  if (!ErrorNode) {
+    Ctx.addTransition(State);
+  } else {
+    Ctx.addTransition(State, ErrorNode);
+  }
 }
-void MPIChecker::checkFileOpen(const CallEvent &PreCallEvent,
+
+void MPIChecker::checkDoubleOpen(const CallEvent &PreCallEvent,
                                CheckerContext &Ctx) const {
   // if the Func Call is File_Open
   if (!FuncClassifier->isMPI_File_open(PreCallEvent.getCalleeIdentifier())) {
@@ -144,14 +158,19 @@ void MPIChecker::checkFileOpen(const CallEvent &PreCallEvent,
   // capture the next transition where the State is open
   ProgramStateRef State = Ctx.getState();
   const MPIFile *const Fh = State->get<MPIFileMap>(MR);
-  State = State->set<MPIFileMap>(MR, MPIFile::State::Open);
-      printf("File is open\n");
-
-  // just to check the functionality
-  ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
-    BReporter.reportOpen(PreCallEvent, *Fh, MR, ErrorNode,
+  if(Fh && Fh->CurrentState == MPIFile::State::Open)
+  {
+    // not needed, just for testing
+    ExplodedNode *ErrorNode = Ctx.generateNonFatalErrorNode();
+    BReporter.reportDoubleOpen(PreCallEvent, *Fh, MR, ErrorNode,
                                       Ctx.getBugReporter());
     Ctx.addTransition(ErrorNode->getState(), ErrorNode);
+  }else {
+     // important to track File_open
+    State = State->set<MPIFileMap>(MR, MPIFile::State::Open);
+    Ctx.addTransition(State);
+  }
+  
 }
 
 void MPIChecker::checkUnmatchedWaits(const CallEvent &PreCallEvent,

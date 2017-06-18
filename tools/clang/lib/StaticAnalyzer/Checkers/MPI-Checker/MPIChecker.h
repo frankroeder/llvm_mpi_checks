@@ -38,14 +38,14 @@ public:
     dynamicInit(Ctx);
     checkUnmatchedWaits(CE, Ctx);
     checkDoubleNonblocking(CE, Ctx);
-    checkFileOpen(CE, Ctx);
+    checkDoubleOpen(CE, Ctx);
     checkDoubleClose(CE, Ctx);
   }
 
   void checkDeadSymbols(SymbolReaper &SymReaper, CheckerContext &Ctx) const {
     dynamicInit(Ctx);
     checkMissingWaits(SymReaper, Ctx);
-    checkFileLeak(SymReaper, Ctx);
+    checkMissingClose(SymReaper, Ctx);
   }
 
   void dynamicInit(CheckerContext &Ctx) const {
@@ -77,13 +77,17 @@ public:
   void checkMissingWaits(clang::ento::SymbolReaper &SymReaper,
                          clang::ento::CheckerContext &Ctx) const;
 
+  // Check if the file handle is closed twice
+  // \param PreCallEvent MPI call to verifiy (MPI_File_close(fh))
   void checkDoubleClose(const clang::ento::CallEvent &PreCallEvent,
                         clang::ento::CheckerContext &Ctx) const;
 
-  void checkFileLeak(clang::ento::SymbolReaper &SymReaper,
+  // Should check if there is no following file close after open
+  void checkMissingClose(clang::ento::SymbolReaper &SymReaper,
                      clang::ento::CheckerContext &Ctx) const;
 
-  void checkFileOpen(const clang::ento::CallEvent &PreCallEvent,
+  // just for testing the open detection
+  void checkDoubleOpen(const clang::ento::CallEvent &PreCallEvent,
                      clang::ento::CheckerContext &Ctx) const;
 
 private:

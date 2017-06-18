@@ -47,37 +47,39 @@ void MPIBugReporter::reportDoubleNonblocking(
   BReporter.emitReport(std::move(Report));
 }
 
-void MPIBugReporter::reportOpen(
-        const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
-        const MemRegion *const MPIFileRegion,
-        const ExplodedNode *const ExplNode,
-        BugReporter &BReporter) const {
-    std::string ErrorText;
-    ErrorText = "File was opened here on file " +
-        MPIFileRegion->getDescriptiveName() + ". ";
-    auto Report = llvm::make_unique<BugReport>(*OpenBugType,
-                                                ErrorText, ExplNode);
-    Report->addRange(MPICallEvent.getSourceRange());
-    SourceRange Range = MPIFileRegion->sourceRange();
-    
-    if (Range.isValid())
-    Report->addRange(Range);
-  BReporter.emitReport(std::move(Report));
+void MPIBugReporter::reportDoubleOpen(const CallEvent &MPICallEvent,
+                                const ento::mpi::MPIFile &Fh,
+                                const MemRegion *const MPIFileRegion,
+                                const ExplodedNode *const ExplNode,
+                                BugReporter &BReporter) const {
+  std::string ErrorText;
+  ErrorText = "Double open on file " +
+              MPIFileRegion->getDescriptiveName() + ". ";
+  auto Report =
+      llvm::make_unique<BugReport>(*DoubleOpenBugType, ErrorText, ExplNode);
+  Report->addRange(MPICallEvent.getSourceRange());
+  SourceRange Range = MPIFileRegion->sourceRange();
 
+  if (Range.isValid())
+    Report->addRange(Range);
+
+  Report->addVisitor(llvm::make_unique<MPIFileNodeVisitor>(
+      MPIFileRegion, "File is previously opened here. "));
+  Report->markInteresting(MPIFileRegion);
+  BReporter.emitReport(std::move(Report));
 }
 
-void MPIBugReporter::reportDoubleClose(
-    const CallEvent &MPICallEvent, const ento::mpi::MPIFile &Fh,
-    const MemRegion *const MPIFileRegion,
-    const ExplodedNode *const ExplNode,
-    BugReporter &BReporter) const {
-
+void MPIBugReporter::reportDoubleClose(const CallEvent &MPICallEvent,
+                                       const ento::mpi::MPIFile &Fh,
+                                       const MemRegion *const MPIFileRegion,
+                                       const ExplodedNode *const ExplNode,
+                                       BugReporter &BReporter) const {
   std::string ErrorText;
-  ErrorText = "Double close on file " +
-              MPIFileRegion->getDescriptiveName() + ". ";
+  ErrorText =
+      "Double close on file " + MPIFileRegion->getDescriptiveName() + ". ";
 
-  auto Report = llvm::make_unique<BugReport>(*DoubleCloseBugType,
-                                             ErrorText, ExplNode);
+  auto Report =
+      llvm::make_unique<BugReport>(*DoubleCloseBugType, ErrorText, ExplNode);
 
   Report->addRange(MPICallEvent.getSourceRange());
   SourceRange Range = MPIFileRegion->sourceRange();
@@ -95,13 +97,13 @@ void MPIBugReporter::reportFileLeak(const ento::mpi::MPIFile &Fh,
                                     const MemRegion *const MPIFileRegion,
                                     const ExplodedNode *const ExplNode,
                                     BugReporter &BReporter) const {
-
   std::string ErrorText;
-  ErrorText =
-      "File has not been closed " + MPIFileRegion->getDescriptiveName() + ". ";
+  ErrorText = "File  " + MPIFileRegion->getDescriptiveName() +
+              "has no matching close. ";
 
   auto Report =
       llvm::make_unique<BugReport>(*FileLeakBugType, ErrorText, ExplNode);
+
   SourceRange Range = MPIFileRegion->sourceRange();
   if (Range.isValid())
     Report->addRange(Range);

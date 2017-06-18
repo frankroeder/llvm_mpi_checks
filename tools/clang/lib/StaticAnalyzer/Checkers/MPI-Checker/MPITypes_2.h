@@ -17,7 +17,8 @@ public:
   MPIFile(State S) : CurrentState{S} {}
 
   // FastFoldingSetNode - This is a subclass of FoldingSetNode which stores
-  // a FoldingSetNodeID value rather than requiring the node to recompute it each time it is needed.
+  // a FoldingSetNodeID value rather than requiring the node to recompute
+  // it each time it is needed.
   void Profile(llvm::FoldingSetNodeID &Id) const {
     Id.AddInteger(CurrentState);
   }
@@ -30,7 +31,6 @@ public:
   const State CurrentState;
 };
 
-// MemRegio Mapping lesen
 struct MPIFileMap {};
 // LLVM Immutable container to store data structures
 // the maps should NOT be stored inside the checker class/state
