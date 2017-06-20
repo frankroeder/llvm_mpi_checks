@@ -141,6 +141,7 @@ void MPIChecker::checkMissingClose(SymbolReaper &SymReaper,
   }
 }
 
+// just for testing - tracks file open
 void MPIChecker::checkDoubleOpen(const CallEvent &PreCallEvent,
                                CheckerContext &Ctx) const {
   // if the Func Call is File_Open
