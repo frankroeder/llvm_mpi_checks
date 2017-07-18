@@ -295,13 +295,12 @@ void TypeMismatchCheck::check(const MatchFinder::MatchResult &Result) {
     } else if (FuncClassifier.isBcastType(Identifier)) {
       addPair(0, 2);
     }
-  }else if(FuncClassifier.isMPI_IOType(Identifier)){
-    if(FuncClassifier.isMPIWR_Type(Identifier)) {
-      // if file i/write or i/read
-      addPair(1, 3);
-    } else if(FuncClassifier.isMPI_File_write_at(Identifier) ||
-      FuncClassifier.isMPI_File_read_at(Identifier)){
+  }else if(FuncClassifier.isMPIIO_Type(Identifier)){
+    if(FuncClassifier.isMPIIO_explicit_offset(Identifier)) {
       addPair(2, 4);
+    } else if(FuncClassifier.isMPIIO_individual_file_pointers(Identifier) ||
+      FuncClassifier.isMPIIO_shared_file_pointer(Identifier)){
+      addPair(1, 3);
     }
   }
   checkArguments(BufferTypes, BufferExprs, MPIDatatypes, getLangOpts());

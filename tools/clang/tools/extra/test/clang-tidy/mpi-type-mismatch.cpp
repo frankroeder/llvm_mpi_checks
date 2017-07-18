@@ -39,6 +39,47 @@ void charNegativeTest() {
   long buf9;
   MPI_File_read(fh, &buf9, 1, MPI_CHAR, MPI_STATUS_IGNORE);
   // CHECK-MESSAGES: :[[@LINE-1]]:21: warning: buffer type 'long' does not match the MPI datatype 'MPI_CHAR'
+   
+  short buf10;
+  MPI_File_read_at(fh, 0, &buf10, 1, MPI_LONG, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:27: warning: buffer type 'short' does not match the MPI datatype 'MPI_LONG'
+   
+  int buf11;
+  MPI_File_write_at(fh, 0, &buf11, 1, MPI_CHAR, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:28: warning: buffer type 'int' does not match the MPI datatype 'MPI_CHAR'
+   
+  float buf12;
+  MPI_File_iread(fh, &buf12, 1, MPI_CHAR, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:22: warning: buffer type 'float' does not match the MPI datatype 'MPI_CHAR'
+   
+  int buf13;
+  MPI_File_iwrite(fh, &buf13, 1, MPI_CHAR, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:23: warning: buffer type 'int' does not match the MPI datatype 'MPI_CHAR'
+  // 
+  double buf14;
+  MPI_Request reg;
+  MPI_File_iread_at(fh, 0, &buf14, 1, MPI_CHAR, &reg);
+  // CHECK-MESSAGES: :[[@LINE-1]]:28: warning: buffer type 'double' does not match the MPI datatype 'MPI_CHAR'
+   
+  long buf15;
+  MPI_File_iwrite_at(fh, 0, &buf15, 1, MPI_CHAR, &reg);
+  // CHECK-MESSAGES: :[[@LINE-1]]:29: warning: buffer type 'long' does not match the MPI datatype 'MPI_CHAR'
+   
+  long buf16;
+  MPI_File_read_shared(fh, &buf16, 1, MPI_CHAR, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:28: warning: buffer type 'long' does not match the MPI datatype 'MPI_CHAR'
+   
+  int buf17;
+  MPI_File_iwrite_shared(fh, &buf17, 1, MPI_CHAR, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:30: warning: buffer type 'int' does not match the MPI datatype 'MPI_CHAR'
+  
+  short buf18;
+  MPI_File_iread_shared(fh, &buf18, 1, MPI_CHAR, &reg);
+  // CHECK-MESSAGES: :[[@LINE-1]]:29: warning: buffer type 'short' does not match the MPI datatype 'MPI_CHAR'
+   
+  double buf19;
+  MPI_File_iwrite_shared(fh, &buf19, 1, MPI_CHAR, &reg);
+  // CHECK-MESSAGES: :[[@LINE-1]]:30: warning: buffer type 'double' does not match the MPI datatype 'MPI_CHAR'
 }
 
 void intNegativeTest() {

@@ -41,12 +41,37 @@ void negativeTests() {
   // CHECK-MESSAGES: :[[@LINE-1]]:27: warning: buffer is insufficiently dereferenced: pointer->pointer
 
   int *buf10;
-  MPI_File_write(fh, &buf10, 1, MPI_INT, MPI_STATUS_IGNORE);
-  // CHECK-MESSAGES: :[[@LINE-1]]:22: warning: buffer is insufficiently dereferenced: pointer->pointer
+  MPI_File_iwrite(fh, &buf9, 1, MPI_INT, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:23: warning: buffer is insufficiently dereferenced: pointer->pointer
 
   int *buf11;
-  MPI_File_read(fh, &buf11, 1, MPI_INT, MPI_STATUS_IGNORE);
-  // CHECK-MESSAGES: :[[@LINE-1]]:21: warning: buffer is insufficiently dereferenced: pointer->pointer
+  MPI_File_iread(fh, &buf11, 1, MPI_INT, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:22: warning: buffer is insufficiently dereferenced: pointer->pointer
+  
+  int *buf12;
+  MPI_Request req;
+  MPI_File_iread_at(fh, 0, &buf12, 1, MPI_INT, &req);
+  // CHECK-MESSAGES: :[[@LINE-1]]:28: warning: buffer is insufficiently dereferenced: pointer->pointer
+  
+  int **buf13;
+  MPI_File_iwrite_at(fh, 0, buf13, 1, MPI_INT, &req);
+  // CHECK-MESSAGES: :[[@LINE-1]]:29: warning: buffer is insufficiently dereferenced: pointer->pointer
+   
+  int *buf14;
+  MPI_File_read_shared(fh, &buf14, 1, MPI_INT, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:28: warning: buffer is insufficiently dereferenced: pointer->pointer
+  
+  int **buf15;
+  MPI_File_write_shared(fh, buf15, 1, MPI_INT, MPI_STATUS_IGNORE);
+  // CHECK-MESSAGES: :[[@LINE-1]]:29: warning: buffer is insufficiently dereferenced: pointer->pointer
+  
+  int buf16[1][3];
+  MPI_File_iread_at(fh, 0, buf16, 1, MPI_INT, &req);
+  // CHECK-MESSAGES: :[[@LINE-1]]:28: warning: buffer is insufficiently dereferenced: array->array 
+  
+  int **buf17;
+  MPI_File_iwrite_at(fh, 0, buf17, 1, MPI_INT, &req);
+  // CHECK-MESSAGES: :[[@LINE-1]]:29: warning: buffer is insufficiently dereferenced: pointer->pointer
 }
 
 void positiveTests() {
@@ -91,4 +116,23 @@ void positiveTests() {
 
   int buf13;
   MPI_File_iread(fh, &buf13, 1, MPI_INT, MPI_STATUS_IGNORE);
+
+  int *buf14;
+  MPI_Request req;
+  MPI_File_iread_at(fh, 0, buf14, 1, MPI_INT, &req);
+  
+  int *buf15;
+  MPI_File_iwrite_at(fh, 0, buf15, 1, MPI_INT, &req);
+   
+  int buf16;
+  MPI_File_read_shared(fh, &buf16, 1, MPI_INT, MPI_STATUS_IGNORE);
+  
+  int buf17;
+  MPI_File_write_shared(fh, &buf17, 1, MPI_INT, MPI_STATUS_IGNORE);
+  
+  int buf18[1][3];
+  MPI_File_iread_at(fh, 0, buf18[0], 1, MPI_INT, &req);
+  
+  int *buf19;
+  MPI_File_iwrite_at(fh, 0, buf19, 1, MPI_INT, &req);
 }

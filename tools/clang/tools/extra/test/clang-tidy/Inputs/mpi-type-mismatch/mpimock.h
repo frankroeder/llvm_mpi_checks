@@ -63,11 +63,17 @@ int MPI_Reduce(const void *, void *, int, MPI_Datatype, MPI_Op, int, MPI_Comm);
 int MPI_Ireduce(const void *, void *, int, MPI_Datatype, MPI_Op, int, MPI_Comm,
     MPI_Request *);
 int MPI_Bcast(void *, int count, MPI_Datatype, int, MPI_Comm);
-int MPI_File_write(MPI_File, const void *, int, MPI_Datatype, MPI_Status *);
 int MPI_File_read(MPI_File, void *, int, MPI_Datatype, MPI_Status *);
-int MPI_File_write_at(MPI_File, MPI_Offset, const void *, int, MPI_Datatype, MPI_Status *);
+int MPI_File_write(MPI_File, const void *, int, MPI_Datatype, MPI_Status *);
 int MPI_File_read_at(MPI_File, MPI_Offset, void *, int, MPI_Datatype, MPI_Status *);
-int MPI_File_iwrite(MPI_File, const void *, int, MPI_Datatype, MPI_Request *);
+int MPI_File_write_at(MPI_File, MPI_Offset, const void *, int, MPI_Datatype, MPI_Status *);
 int MPI_File_iread(MPI_File, void *, int, MPI_Datatype, MPI_Request *);
+int MPI_File_iwrite(MPI_File, const void *, int, MPI_Datatype, MPI_Request *);
+int MPI_File_iread_at(MPI_File, MPI_Offset, void *, int, MPI_Datatype, MPI_Request *);
+int MPI_File_iwrite_at(MPI_File, MPI_Offset, const void *, int, MPI_Datatype, MPI_Request *);
+int MPI_File_read_shared(MPI_File, void *, int, MPI_Datatype, MPI_Status *);
+int MPI_File_write_shared(MPI_File, const void *, int, MPI_Datatype, MPI_Status *);
+int MPI_File_iread_shared(MPI_File, void *, int, MPI_Datatype, MPI_Request *);
+int MPI_File_iwrite_shared(MPI_File, const void *, int, MPI_Datatype, MPI_Request *);
 
 #endif  // end of include guard: MPIMOCK_H
