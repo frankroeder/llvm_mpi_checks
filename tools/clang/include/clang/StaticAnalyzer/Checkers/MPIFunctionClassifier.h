@@ -43,12 +43,16 @@ public:
   bool isBcastType(const IdentifierInfo *const IdentInfo) const;
 
   // io-function identifiers
-  bool isMPI_IOType(const IdentifierInfo *const IdentInfo) const;
-  bool isMPIWR_Type(const IdentifierInfo *const IdentInfo) const;
-  bool isMPI_File_write_at(const IdentifierInfo *IdentInfo) const;
-  bool isMPI_File_read_at(const IdentifierInfo *IdentInfo) const;
-  bool isMPI_File_open(const IdentifierInfo *IdentInfo) const;
-  bool isMPI_File_close(const IdentifierInfo *IdentInfo) const;
+  bool isMPIIO_Type(const IdentifierInfo *const IdentInfo) const;
+  bool isMPI_File_open(const IdentifierInfo *const IdentInfo) const;
+  bool isMPI_File_close(const IdentifierInfo *const IdentInfo) const;
+  bool isMPIIO_file_manipulation(const IdentifierInfo *IdentInfo) const;
+  bool isMPIIO_collective(const IdentifierInfo *const IdentInfo) const;
+  bool isMPIIO_blocking(const IdentifierInfo *IdentInfo) const;
+  bool isMPIIO_nonblocking(const IdentifierInfo *IdentInfo) const;
+  bool isMPIIO_explicit_offset(const IdentifierInfo *IdentInfo) const;
+  bool isMPIIO_individual_file_pointers(const IdentifierInfo *IdentInfo) const;
+  bool isMPIIO_shared_file_pointer(const IdentifierInfo *IdentInfo) const;
 
   // additional identifiers
   bool isMPI_Wait(const IdentifierInfo *const IdentInfo) const;
@@ -75,7 +79,7 @@ private:
   llvm::SmallVector<IdentifierInfo *, 4> MPICollToPointTypes;
   llvm::SmallVector<IdentifierInfo *, 6> MPICollToCollTypes;
 
-  llvm::SmallVector<IdentifierInfo *, 12> MPIIOTypes;
+  llvm::SmallVector<IdentifierInfo *, 18> MPIIOTypes;
 
   llvm::SmallVector<IdentifierInfo *, 44> MPIType; //32
 
@@ -97,12 +101,24 @@ private:
       *IdentInfo_MPI_Ialltoall = nullptr, *IdentInfo_MPI_Barrier = nullptr;
 
   // io-function identifiers
-  IdentifierInfo *IdentInfo_MPI_File_open = nullptr, *IdentInfo_MPI_File_close = nullptr,
-  *IdentInfo_MPI_File_read = nullptr, *IdentInfo_MPI_File_seek = nullptr,
-  *IdentInfo_MPI_File_write = nullptr, *IdentInfo_MPI_File_write_at = nullptr,
-  *IdentInfo_MPI_File_read_at = nullptr, *IdentInfo_MPI_File_set_view = nullptr,
-   *IdentInfo_MPI_File_seek_shared = nullptr, *IdentInfo_MPI_Type_create_subarray = nullptr,
-   *IdentInfo_MPI_File_iread = nullptr, *IdentInfo_MPI_File_iwrite = nullptr;
+  IdentifierInfo *IdentInfo_MPI_File_open = nullptr,
+                 *IdentInfo_MPI_File_close = nullptr,
+                 *IdentInfo_MPI_File_read = nullptr,
+                 *IdentInfo_MPI_File_write = nullptr,
+                 *IdentInfo_MPI_File_write_at = nullptr,
+                 *IdentInfo_MPI_File_read_at = nullptr,
+                 *IdentInfo_MPI_File_set_view = nullptr,
+                 *IdentInfo_MPI_File_seek = nullptr,
+                 *IdentInfo_MPI_File_seek_shared = nullptr,
+                 *IdentInfo_MPI_Type_create_subarray = nullptr,
+                 *IdentInfo_MPI_File_iread = nullptr,
+                 *IdentInfo_MPI_File_iwrite = nullptr,
+                 *IdentInfo_MPI_File_iread_at = nullptr,
+                 *IdentInfo_MPI_File_iwrite_at = nullptr,
+                 *IdentInfo_MPI_File_write_shared = nullptr,
+                 *IdentInfo_MPI_File_read_shared = nullptr,
+                 *IdentInfo_MPI_File_iwrite_shared = nullptr,
+                 *IdentInfo_MPI_File_iread_shared = nullptr;
 
   // additional functions
   IdentifierInfo *IdentInfo_MPI_Comm_rank = nullptr,

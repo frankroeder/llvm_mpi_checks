@@ -148,6 +148,7 @@ void MPIChecker::checkDoubleOpen(const CallEvent &PreCallEvent,
   if (!FuncClassifier->isMPI_File_open(PreCallEvent.getCalleeIdentifier())) {
     return;
   }
+
   const MemRegion *const MR =
       PreCallEvent.getArgSVal(PreCallEvent.getNumArgs() - 1).getAsRegion();
   if (!MR)
@@ -158,6 +159,7 @@ void MPIChecker::checkDoubleOpen(const CallEvent &PreCallEvent,
     return;
   // capture the next transition where the State is open
   ProgramStateRef State = Ctx.getState();
+
   const MPIFile *const Fh = State->get<MPIFileMap>(MR);
   if(Fh && Fh->CurrentState == MPIFile::State::Open)
   {
@@ -171,7 +173,6 @@ void MPIChecker::checkDoubleOpen(const CallEvent &PreCallEvent,
     State = State->set<MPIFileMap>(MR, MPIFile::State::Open);
     Ctx.addTransition(State);
   }
-  
 }
 
 void MPIChecker::checkUnmatchedWaits(const CallEvent &PreCallEvent,

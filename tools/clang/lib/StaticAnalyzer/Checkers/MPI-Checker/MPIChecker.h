@@ -38,8 +38,6 @@ public:
     dynamicInit(Ctx);
     checkUnmatchedWaits(CE, Ctx);
     checkDoubleNonblocking(CE, Ctx);
-    checkDoubleOpen(CE, Ctx);
-    checkDoubleClose(CE, Ctx);
   }
 
   void checkDeadSymbols(SymbolReaper &SymReaper, CheckerContext &Ctx) const {
@@ -89,7 +87,6 @@ public:
   // just for testing the open detection
   void checkDoubleOpen(const clang::ento::CallEvent &PreCallEvent,
                      clang::ento::CheckerContext &Ctx) const;
-
 private:
   /// Collects all memory regions of a request(array) used by a wait
   /// function. If the wait function uses a single request, this is a single

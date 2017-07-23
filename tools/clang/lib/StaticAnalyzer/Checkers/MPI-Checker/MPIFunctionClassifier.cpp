@@ -186,60 +186,92 @@ void MPIFunctionClassifier::initIOIdentifiers(ASTContext &ASTCtx){
   MPIType.push_back(IdentInfo_MPI_File_open);
   assert(IdentInfo_MPI_File_open);
 
-  IdentInfo_MPI_File_seek = &ASTCtx.Idents.get("MPI_File_seek");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_seek);
-  MPIType.push_back(IdentInfo_MPI_File_seek);
-  assert(IdentInfo_MPI_File_seek);
-
-  IdentInfo_MPI_File_write = &ASTCtx.Idents.get("MPI_File_write");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_write);
-  MPIType.push_back(IdentInfo_MPI_File_write);
-  assert(IdentInfo_MPI_File_write);
+  IdentInfo_MPI_File_close = &ASTCtx.Idents.get("MPI_File_close");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_close);
+  MPIType.push_back(IdentInfo_MPI_File_close);
+  assert(IdentInfo_MPI_File_close);
 
   IdentInfo_MPI_File_read = &ASTCtx.Idents.get("MPI_File_read");
   MPIIOTypes.push_back(IdentInfo_MPI_File_read);
   MPIType.push_back(IdentInfo_MPI_File_read);
   assert(IdentInfo_MPI_File_read);
 
-  IdentInfo_MPI_File_seek_shared = &ASTCtx.Idents.get("MPI_File_seek_shared");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_seek_shared);
-  MPIType.push_back(IdentInfo_MPI_File_seek_shared);
-  assert(IdentInfo_MPI_File_seek_shared);
-
-  IdentInfo_MPI_File_close = &ASTCtx.Idents.get("MPI_File_close");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_close);
-  MPIType.push_back(IdentInfo_MPI_File_close);
-  assert(IdentInfo_MPI_File_close);
-
-  IdentInfo_MPI_File_write_at = &ASTCtx.Idents.get("MPI_File_write_at");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_write_at);
-  MPIType.push_back(IdentInfo_MPI_File_write_at);
-  assert(IdentInfo_MPI_File_write_at);
+  IdentInfo_MPI_File_write = &ASTCtx.Idents.get("MPI_File_write");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_write);
+  MPIType.push_back(IdentInfo_MPI_File_write);
+  assert(IdentInfo_MPI_File_write);
 
   IdentInfo_MPI_File_read_at = &ASTCtx.Idents.get("MPI_File_read_at");
   MPIIOTypes.push_back(IdentInfo_MPI_File_read_at);
   MPIType.push_back(IdentInfo_MPI_File_read_at);
   assert(IdentInfo_MPI_File_read_at);
 
-  IdentInfo_MPI_File_iwrite = &ASTCtx.Idents.get("MPI_File_iwrite");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_iwrite);
-  MPIType.push_back(IdentInfo_MPI_File_iwrite);
-  assert(IdentInfo_MPI_File_iwrite);
-
-  IdentInfo_MPI_File_iread = &ASTCtx.Idents.get("MPI_File_iread");
-  MPIIOTypes.push_back(IdentInfo_MPI_File_iread);
-  MPIType.push_back(IdentInfo_MPI_File_iread);
-  assert(IdentInfo_MPI_File_iread);
+  IdentInfo_MPI_File_write_at = &ASTCtx.Idents.get("MPI_File_write_at");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_write_at);
+  MPIType.push_back(IdentInfo_MPI_File_write_at);
+  assert(IdentInfo_MPI_File_write_at);
 
   IdentInfo_MPI_File_set_view = &ASTCtx.Idents.get("MPI_File_set_view");
   MPIIOTypes.push_back(IdentInfo_MPI_File_set_view);
   MPIType.push_back(IdentInfo_MPI_File_set_view);
   assert(IdentInfo_MPI_File_set_view);
 
-  IdentInfo_MPI_Type_create_subarray = &ASTCtx.Idents.get("MPI_Type_create_subarray");
+  IdentInfo_MPI_File_seek = &ASTCtx.Idents.get("MPI_File_seek");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_seek);
+  MPIType.push_back(IdentInfo_MPI_File_seek);
+  assert(IdentInfo_MPI_File_seek);
+
+  IdentInfo_MPI_File_seek_shared = &ASTCtx.Idents.get("MPI_File_seek_shared");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_seek_shared);
+  MPIType.push_back(IdentInfo_MPI_File_seek_shared);
+  assert(IdentInfo_MPI_File_seek_shared);
+
+  IdentInfo_MPI_Type_create_subarray =
+      &ASTCtx.Idents.get("MPI_Type_create_subarray");
   MPIIOTypes.push_back(IdentInfo_MPI_Type_create_subarray);
   MPIType.push_back(IdentInfo_MPI_Type_create_subarray);
   assert(IdentInfo_MPI_Type_create_subarray);
+
+  IdentInfo_MPI_File_iread = &ASTCtx.Idents.get("MPI_File_iread");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_iread);
+  MPIType.push_back(IdentInfo_MPI_File_iread);
+  assert(IdentInfo_MPI_File_iread);
+
+  IdentInfo_MPI_File_iwrite = &ASTCtx.Idents.get("MPI_File_iwrite");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_iwrite);
+  MPIType.push_back(IdentInfo_MPI_File_iwrite);
+  assert(IdentInfo_MPI_File_iwrite);
+
+  IdentInfo_MPI_File_iread_at = &ASTCtx.Idents.get("MPI_File_iread_at");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_iread_at);
+  MPIType.push_back(IdentInfo_MPI_File_iread_at);
+  assert(IdentInfo_MPI_File_iread_at);
+
+  IdentInfo_MPI_File_iwrite_at = &ASTCtx.Idents.get("MPI_File_iwrite_at");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_iwrite_at);
+  MPIType.push_back(IdentInfo_MPI_File_iwrite_at);
+  assert(IdentInfo_MPI_File_iwrite_at);
+
+  IdentInfo_MPI_File_read_shared = &ASTCtx.Idents.get("MPI_File_read_shared");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_read_shared);
+  MPIType.push_back(IdentInfo_MPI_File_read_shared);
+  assert(IdentInfo_MPI_File_read_shared);
+  
+  IdentInfo_MPI_File_write_shared = &ASTCtx.Idents.get("MPI_File_write_shared");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_write_shared);
+  MPIType.push_back(IdentInfo_MPI_File_write_shared);
+  assert(IdentInfo_MPI_File_write_shared);
+
+  IdentInfo_MPI_File_iread_shared = &ASTCtx.Idents.get("MPI_File_iread_shared");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_iread_shared);
+  MPIType.push_back(IdentInfo_MPI_File_iread_shared);
+  assert(IdentInfo_MPI_File_iread_shared);
+  
+  IdentInfo_MPI_File_iwrite_shared = &ASTCtx.Idents.get("MPI_File_iwrite_shared");
+  MPIIOTypes.push_back(IdentInfo_MPI_File_iwrite_shared);
+  MPIType.push_back(IdentInfo_MPI_File_iwrite_shared);
+  assert(IdentInfo_MPI_File_iwrite_shared);
+
 }
 
 void MPIFunctionClassifier::initAdditionalIdentifiers(ASTContext &ASTCtx) {
@@ -335,37 +367,91 @@ bool MPIFunctionClassifier::isReduceType(
 }
 
 // io identifiers
-bool MPIFunctionClassifier::isMPI_IOType(
+bool MPIFunctionClassifier::isMPIIO_Type(
   const IdentifierInfo *IdentInfo) const {
   	return llvm::is_contained(MPIIOTypes, IdentInfo);
 }
 
 bool MPIFunctionClassifier::isMPI_File_open(
     const IdentifierInfo *IdentInfo) const {
-    return IdentInfo == IdentInfo_MPI_File_open;
+  return IdentInfo == IdentInfo_MPI_File_open;
 }
 
 bool MPIFunctionClassifier::isMPI_File_close(
     const IdentifierInfo *IdentInfo) const {
-    return IdentInfo == IdentInfo_MPI_File_close;
+  return IdentInfo == IdentInfo_MPI_File_close;
 }
 
-bool MPIFunctionClassifier::isMPIWR_Type(
+// file manipulation
+bool MPIFunctionClassifier::isMPIIO_file_manipulation(
+    const IdentifierInfo *IdentInfo) const {
+    return IdentInfo == IdentInfo_MPI_File_open ||
+     IdentInfo == IdentInfo_MPI_File_close;
+}
+
+// data access routines
+bool MPIFunctionClassifier::isMPIIO_collective(
   const IdentifierInfo *IdentInfo) const {
-  return IdentInfo == IdentInfo_MPI_File_write ||
-         IdentInfo == IdentInfo_MPI_File_read ||
+  return IdentInfo == IdentInfo_MPI_File_read ||
+         IdentInfo == IdentInfo_MPI_File_write ||
+         IdentInfo == IdentInfo_MPI_File_read_at ||
+         IdentInfo == IdentInfo_MPI_File_write_at ||
+         IdentInfo == IdentInfo_MPI_File_iread ||
          IdentInfo == IdentInfo_MPI_File_iwrite ||
-         IdentInfo == IdentInfo_MPI_File_iread;
+         IdentInfo == IdentInfo_MPI_File_iread_at ||
+         IdentInfo == IdentInfo_MPI_File_iwrite_at ||
+         IdentInfo == IdentInfo_MPI_File_read_shared ||
+         IdentInfo == IdentInfo_MPI_File_write_shared ||
+         IdentInfo == IdentInfo_MPI_File_iread_shared ||
+         IdentInfo == IdentInfo_MPI_File_iwrite_shared; 
 }
 
-bool MPIFunctionClassifier::isMPI_File_write_at(
-  const IdentifierInfo *IdentInfo) const {
-  return IdentInfo == IdentInfo_MPI_File_write_at;
+// blocking
+bool MPIFunctionClassifier::isMPIIO_blocking(
+    const IdentifierInfo *IdentInfo) const {
+  return IdentInfo == IdentInfo_MPI_File_read ||
+         IdentInfo == IdentInfo_MPI_File_write ||
+         IdentInfo == IdentInfo_MPI_File_read_at ||
+         IdentInfo == IdentInfo_MPI_File_write_at ||
+         IdentInfo == IdentInfo_MPI_File_read_shared ||
+         IdentInfo == IdentInfo_MPI_File_write_shared;
 }
 
-bool MPIFunctionClassifier::isMPI_File_read_at(
-  const IdentifierInfo *IdentInfo) const {
-  return IdentInfo == IdentInfo_MPI_File_read_at;
+// nonblocking
+bool MPIFunctionClassifier::isMPIIO_nonblocking(
+    const IdentifierInfo *IdentInfo) const {
+  return IdentInfo == IdentInfo_MPI_File_iread ||
+         IdentInfo == IdentInfo_MPI_File_iwrite ||
+         IdentInfo == IdentInfo_MPI_File_iread_at ||
+         IdentInfo == IdentInfo_MPI_File_iwrite_at ||
+         IdentInfo == IdentInfo_MPI_File_iread_shared ||
+         IdentInfo == IdentInfo_MPI_File_iwrite_shared;
+}
+
+// explicit offsets 
+bool MPIFunctionClassifier::isMPIIO_explicit_offset(
+    const IdentifierInfo *IdentInfo) const {
+  return IdentInfo == IdentInfo_MPI_File_read_at ||
+         IdentInfo == IdentInfo_MPI_File_write_at ||
+         IdentInfo == IdentInfo_MPI_File_iread_at ||
+         IdentInfo == IdentInfo_MPI_File_iwrite_at;
+}
+
+// individual file pointers
+bool MPIFunctionClassifier::isMPIIO_individual_file_pointers(
+    const IdentifierInfo *IdentInfo) const {
+  return IdentInfo == IdentInfo_MPI_File_read ||
+         IdentInfo == IdentInfo_MPI_File_write ||
+         IdentInfo == IdentInfo_MPI_File_iread ||
+         IdentInfo == IdentInfo_MPI_File_iwrite;
+}
+// shared file pointer
+bool MPIFunctionClassifier::isMPIIO_shared_file_pointer(
+    const IdentifierInfo *IdentInfo) const {
+  return IdentInfo == IdentInfo_MPI_File_read_shared ||
+         IdentInfo == IdentInfo_MPI_File_write_shared ||
+         IdentInfo == IdentInfo_MPI_File_iread_shared ||
+         IdentInfo == IdentInfo_MPI_File_iwrite_shared;
 }
 
 // additional identifiers
