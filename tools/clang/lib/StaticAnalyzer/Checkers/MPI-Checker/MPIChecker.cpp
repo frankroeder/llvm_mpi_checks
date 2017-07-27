@@ -90,7 +90,7 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
                                 Ctx.getBugReporter());
     Ctx.addTransition(ErrorNode->getState(), ErrorNode);
   }
-  // no error keep on analyse
+  // no error continue
   else {
     // obtain a new state with a modified trait value
     // trait was defined in MPITypes_2.h
@@ -101,6 +101,7 @@ void MPIChecker::checkDoubleClose(const CallEvent &PreCallEvent,
   }
 }
 
+// in progress
 void MPIChecker::checkMissingClose(SymbolReaper &SymReaper,
                                    CheckerContext &Ctx) const {
   if (!SymReaper.hasDeadSymbols())
@@ -108,7 +109,7 @@ void MPIChecker::checkMissingClose(SymbolReaper &SymReaper,
 
   ProgramStateRef State = Ctx.getState();
   const auto &MPIFiles = State->get<MPIFileMap>();
-  // still empty
+  // still empty - nothing in MPIFiles
   if (MPIFiles.isEmpty())
     return;
 

@@ -38,6 +38,7 @@ public:
     dynamicInit(Ctx);
     checkUnmatchedWaits(CE, Ctx);
     checkDoubleNonblocking(CE, Ctx);
+    checkDoubleClose(CE, Ctx);
   }
 
   void checkDeadSymbols(SymbolReaper &SymReaper, CheckerContext &Ctx) const {

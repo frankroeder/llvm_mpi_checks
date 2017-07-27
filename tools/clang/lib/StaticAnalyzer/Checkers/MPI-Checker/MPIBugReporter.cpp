@@ -47,6 +47,7 @@ void MPIBugReporter::reportDoubleNonblocking(
   BReporter.emitReport(std::move(Report));
 }
 
+// test function
 void MPIBugReporter::reportDoubleOpen(const CallEvent &MPICallEvent,
                                 const ento::mpi::MPIFile &Fh,
                                 const MemRegion *const MPIFileRegion,
@@ -93,6 +94,8 @@ void MPIBugReporter::reportDoubleClose(const CallEvent &MPICallEvent,
 
   BReporter.emitReport(std::move(Report));
 }
+
+// in progress
 void MPIBugReporter::reportFileLeak(const ento::mpi::MPIFile &Fh,
                                     const MemRegion *const MPIFileRegion,
                                     const ExplodedNode *const ExplNode,

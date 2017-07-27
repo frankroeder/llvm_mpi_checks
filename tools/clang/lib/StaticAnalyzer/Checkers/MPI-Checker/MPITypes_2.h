@@ -5,6 +5,8 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "llvm/ADT/SmallSet.h"
 
+// class to track the file handle of MPI
+// This should be useful to track file manipulation
 namespace clang {
 namespace ento {
 namespace mpi {
